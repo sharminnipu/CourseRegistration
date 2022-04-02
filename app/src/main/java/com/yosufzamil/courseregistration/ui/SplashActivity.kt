@@ -8,12 +8,11 @@ import com.yosufzamil.courseregistration.ui.authentication.AuthenticationActivit
 
 class SplashActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivitySplashBinding
-
-
+    private  var _binding: ActivitySplashBinding?=null
+    private  val binding get()=_binding!!
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding= ActivitySplashBinding.inflate(layoutInflater)
+        _binding= ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
         binding.getStartedBtn.setOnClickListener {
@@ -23,4 +22,9 @@ class SplashActivity : AppCompatActivity() {
 
 
     }
+    override fun onDestroy() {
+        super.onDestroy()
+        _binding=null
+    }
+
 }

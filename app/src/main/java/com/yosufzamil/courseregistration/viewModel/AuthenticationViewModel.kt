@@ -1,6 +1,7 @@
 package com.yosufzamil.courseregistration.viewModel
 
 import android.content.Context
+import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import com.yosufzamil.courseregistration.database.entites.Student
 import com.yosufzamil.courseregistration.repository.LocalDBRepository
@@ -11,7 +12,13 @@ class AuthenticationViewModel:ViewModel() {
         return true
     }
 
-    fun getExistEmailORId(context: Context, studentEmail:String,studentId:String) {
+    fun getExistEmailORId(context: Context, studentEmail:String,studentId:String):LiveData<Student>? {
         return LocalDBRepository.getStudentEmailORId(context,studentEmail,studentId)
     }
+
+    fun getEmailAndPassword(context: Context, studentEmail:String,studentPassword:String):LiveData<Student>? {
+        return LocalDBRepository.getEmailAndPassword(context,studentEmail,studentPassword)
+    }
+
+
 }

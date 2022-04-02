@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.database.entites.Student
@@ -50,46 +51,93 @@ class RegistrationFragment : Fragment() {
 
             if (newPassword == confirmPassword) {
 
-                val existResult =
-                    viewModel.getExistEmailORId(requireContext(), studentEmail, studentId)
-                Log.e("student data:", existResult.toString())
-                   /* if(existResult){
-                    Toast.makeText(
-                        requireContext(),
-                        "This email address already exist",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                viewModel.getExistEmailORId(requireContext(),studentEmail,studentId)?.observe(requireActivity(), Observer {
 
-                }else{
+                    if (it!=null) {
+                        Log.e("student data:",  it.toString())
+
+                        if( it.studentEmail == studentEmail){
+                            Toast.makeText(
+                                    requireContext(),
+                                    "This email address already exist",
+                                    Toast.LENGTH_SHORT
+                            ).show()
+                        }else if(it.studentId==studentId){
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Student ID already exist",
+                                    Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+
+                    } else {
+
+                        val result = viewModel.insertStudentToDb(
+                                requireContext(),
+                                Student(studentId, studentName, studentEmail, studentPhone, confirmPassword)
+                        )
+                        if (result) {
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Registration is successfully completed!!",
+                                    Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Sorry, Registration isn't successfully completed!!",
+                                    Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+                    }
+
+
+                })
+
+               /*   var student:Student?= viewModel.getExistEmailORId(requireContext(), studentEmail, studentId)
+                if ( student!=null) {
+                         Log.e("student data:",  student.toString())
+
+                        if( student.studentEmail == studentEmail){
+                            Toast.makeText(
+                                    requireContext(),
+                                    "This email address already exist",
+                                    Toast.LENGTH_SHORT
+                            ).show()
+                        }else if( student.studentId==studentId){
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Student ID already exist",
+                                    Toast.LENGTH_SHORT
+                            ).show()
+                        }
+
+
+                    } else {
+
                     val result = viewModel.insertStudentToDb(
-                        requireContext(),
-                        Student(studentId, studentName, studentEmail, studentPhone, confirmPassword)
+                            requireContext(),
+                            Student(studentId, studentName, studentEmail, studentPhone, confirmPassword)
                     )
-                    if(result){
+                    if (result) {
                         Toast.makeText(
-                            requireContext(),
-                            "Registration is successfully completed!!",
-                            Toast.LENGTH_SHORT
+                                requireContext(),
+                                "Registration is successfully completed!!",
+                                Toast.LENGTH_SHORT
                         ).show()
-                    }else{
+                    } else {
                         Toast.makeText(
-                            requireContext(),
-                            "Sorry, Registration isn't successfully completed!!",
-                            Toast.LENGTH_SHORT
+                                requireContext(),
+                                "Sorry, Registration isn't successfully completed!!",
+                                Toast.LENGTH_SHORT
                         ).show()
                     }
-                }
 
-
-
-            } else {
-                Toast.makeText(
-                    requireContext(),
-                    "Sorry the password isn't match",
-                    Toast.LENGTH_SHORT
-                ).show()
-            }  */
+                }    */
             }
+
         }else{
             Toast.makeText(
                 requireContext(),
@@ -97,7 +145,6 @@ class RegistrationFragment : Fragment() {
                 Toast.LENGTH_SHORT
             ).show()
         }
-
-
     }
+
 }

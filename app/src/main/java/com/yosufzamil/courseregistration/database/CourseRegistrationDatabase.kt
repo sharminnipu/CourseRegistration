@@ -23,7 +23,9 @@ abstract class CourseRegistrationDatabase : RoomDatabase(){
                         instance = Room.databaseBuilder(
                             context, CourseRegistrationDatabase::class.java,
                             DATABASE_NAME
-                        ).build()
+                        )
+                                .allowMainThreadQueries()
+                                .build()
                     }
                 }
 

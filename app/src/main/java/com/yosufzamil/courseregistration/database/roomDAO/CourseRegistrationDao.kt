@@ -14,7 +14,12 @@ interface CourseRegistrationDao {
     suspend fun  insertStudent(student: Student)
 
     @Query("SELECT * FROM student WHERE studentEmail= :email OR studentId= :id")
-    suspend fun getExistEmailAndID(email:String,id:String): Student
+    fun getExistEmailAndID(email:String,id:String): LiveData<Student>
+
+
+    @Query("SELECT * FROM student WHERE studentEmail= :email AND studentPassword= :password")
+    fun getEmailAndPassword(email:String,password:String): LiveData<Student>
+
 
 
 
