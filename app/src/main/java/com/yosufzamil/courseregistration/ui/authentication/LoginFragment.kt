@@ -51,6 +51,7 @@ class LoginFragment : Fragment() {
             viewModel.getEmailAndPassword(requireContext(),getEmail,getPassword)?.observe(requireActivity(), Observer {
                 if(it!=null){
                     if(it.studentEmail==getEmail && it.studentPassword==getPassword){
+                        viewModel.saveAuthEmail(requireContext(),it.studentEmail)
                         activity?.finish()
                         startActivity(Intent(requireActivity(),MainActivity::class.java))
                     }else{

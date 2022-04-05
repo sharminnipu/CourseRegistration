@@ -73,7 +73,7 @@ class RegistrationFragment : Fragment() {
 
                     } else {
 
-                        val result = viewModel.insertStudentToDb(
+                        val result = viewModel.registerStudentToDb(
                                 requireContext(),
                                 Student(studentId, studentName, studentEmail, studentPhone, confirmPassword)
                         )
