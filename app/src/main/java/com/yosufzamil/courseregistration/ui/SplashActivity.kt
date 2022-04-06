@@ -18,13 +18,9 @@ class SplashActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding= ActivitySplashBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        userPreference= UserPreference(baseContext)
+        userPreference= UserPreference(this)
 
         binding.getStartedBtn.setOnClickListener {
-
-
-
-
             userPreference.authEmail.asLiveData().observe(this, {
                 Log.e("auth", it.toString())
                 if(it!=null){

@@ -6,6 +6,8 @@ import androidx.lifecycle.LiveData
 import com.yosufzamil.courseregistration.database.CourseRegistrationDatabase
 import com.yosufzamil.courseregistration.database.entites.Course
 import com.yosufzamil.courseregistration.database.entites.Student
+import com.yosufzamil.courseregistration.database.entites.StudentCourseCrossRef
+import com.yosufzamil.courseregistration.database.relation.StudentWithCourses
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -29,6 +31,13 @@ class LocalDBRepository {
             }
         }
 
+        fun registerCourse(context: Context,crossRef: StudentCourseCrossRef){
+            courseRegistrationDatabase= initialDB(context)
+
+            CoroutineScope(IO).launch {
+                courseRegistrationDatabase?.courseRegistrationDao()?.insertStudentAndCourse(crossRef)}
+            }
+
         fun insertStudent(context: Context,student: Student){
            courseRegistrationDatabase= initialDB(context)
            CoroutineScope(IO).launch {
@@ -39,6 +48,11 @@ class LocalDBRepository {
         fun getAllCourse(context: Context): LiveData<List<Course>>? {
             courseRegistrationDatabase= initialDB(context)
             return courseRegistrationDatabase?.courseRegistrationDao()?.getAllCourse()
+        }
+
+        fun getRegisterCourse(context: Context,studentId:String): LiveData<List<StudentWithCourses>>? {
+            courseRegistrationDatabase= initialDB(context)
+            return courseRegistrationDatabase?.courseRegistrationDao()?.getSubjectOfStudent(studentId)
         }
 
         fun getStudentEmailORId(context: Context, email:String, id:String): LiveData<Student>? {
