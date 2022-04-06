@@ -9,6 +9,7 @@
     <string name="action_logout">Logout</string>
 
     <string name="menu_home">Home</string>
+    <string name="registration">Register</string>
     <string name="menu_gallery">Gallery</string>
     <string name="menu_slideshow">Slideshow</string>
     <!-- TODO: Remove or change this placeholder text -->

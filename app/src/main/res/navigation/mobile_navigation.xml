@@ -9,7 +9,11 @@
         android:id="@+id/nav_home"
         android:name="com.yosufzamil.courseregistration.ui.home.HomeFragment"
         android:label="@string/menu_home"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home" >
+        <action
+            android:id="@+id/action_nav_home_to_courseDetailsFragment"
+            app:destination="@id/courseDetailsFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/nav_gallery"
@@ -22,4 +26,13 @@
         android:name="com.yosufzamil.courseregistration.ui.slideshow.SlideshowFragment"
         android:label="@string/menu_slideshow"
         tools:layout="@layout/fragment_slideshow" />
+    <fragment
+        android:id="@+id/courseDetailsFragment"
+        android:name="com.yosufzamil.courseregistration.ui.home.CourseDetailsFragment"
+        android:label="course_details_fragment"
+        tools:layout="@layout/course_details_fragment" >
+        <action
+            android:id="@+id/action_courseDetailsFragment_to_nav_home"
+            app:destination="@id/nav_home" />
+    </fragment>
 </navigation>

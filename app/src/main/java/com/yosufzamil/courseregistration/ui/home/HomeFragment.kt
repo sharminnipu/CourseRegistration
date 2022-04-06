@@ -10,10 +10,12 @@ import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.adapter.AvailableCourseAdapter
 import com.yosufzamil.courseregistration.database.entites.Course
+import com.yosufzamil.courseregistration.utils.AppConstant.courseDetails
 import kotlinx.android.synthetic.main.fragment_home.*
 
 class HomeFragment : Fragment() {
@@ -47,9 +49,6 @@ class HomeFragment : Fragment() {
 
         })
     }
-
-
-
     private fun fetchData(courses:ArrayList<Course>){
 
         adapter = AvailableCourseAdapter(courses)
@@ -57,15 +56,18 @@ class HomeFragment : Fragment() {
         llm.orientation = GridLayoutManager.VERTICAL
         rvAvailableCourse.layoutManager = llm
         rvAvailableCourse.adapter = adapter
-      /*  adapter.onItemAction = {model,positon ->
+        adapter.onItemAction = {model,positon ->
             courseDetails=model
-            val intent= Intent(applicationContext,AvailableCourseDetails::class.java)
-            startActivity(intent) }
+            findNavController().navigate(R.id.action_nav_home_to_courseDetailsFragment)
+            //val intent= Intent(requireContext(),AvailableCourseDetails::class.java)
+           // startActivity(intent)
+            }
 
         adapter.onListViewAction={model, position ->
             courseDetails=model
-            val intent= Intent(applicationContext,AvailableCourseDetails::class.java)
-            startActivity(intent)
-        }   */
+            findNavController().navigate(R.id.action_nav_home_to_courseDetailsFragment)
+           // val intent= Intent(applicationContext,AvailableCourseDetails::class.java)
+          //  startActivity(intent)
+        }
     }
 }
