@@ -1,12 +1,10 @@
-package com.yosufzamil.courseregistration.ui.home
+package com.yosufzamil.courseregistration.ui.home.avaiableCourse
 
-import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
@@ -15,12 +13,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.adapter.AvailableCourseAdapter
 import com.yosufzamil.courseregistration.database.entites.Course
+import com.yosufzamil.courseregistration.viewModel.AvaiableViewModel
 import com.yosufzamil.courseregistration.utils.AppConstant.courseDetails
 import kotlinx.android.synthetic.main.fragment_home.*
 
-class HomeFragment : Fragment() {
+class AvailableFragment : Fragment() {
 
-    private lateinit var homeViewModel: HomeViewModel
+    private lateinit var avaiableViewModel: AvaiableViewModel
     private lateinit var adapter: AvailableCourseAdapter
     private lateinit var courses:ArrayList<Course>
 
@@ -29,7 +28,7 @@ class HomeFragment : Fragment() {
             container: ViewGroup?,
             savedInstanceState: Bundle?
     ): View? {
-        homeViewModel = ViewModelProvider(this).get(HomeViewModel::class.java)
+        avaiableViewModel = ViewModelProvider(this).get(AvaiableViewModel::class.java)
         val root = inflater.inflate(R.layout.fragment_home, container, false)
         return root
     }
@@ -37,7 +36,7 @@ class HomeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         courses=ArrayList<Course>()
-        homeViewModel.getAllCourse(requireContext())?.observe(viewLifecycleOwner, Observer {
+        avaiableViewModel.getAllCourse(requireContext())?.observe(viewLifecycleOwner, Observer {
             Log.e("course",it.toString())
             if(it.isEmpty()){
 

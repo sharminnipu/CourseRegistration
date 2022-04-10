@@ -5,6 +5,7 @@ import android.provider.ContactsContract
 import androidx.lifecycle.LiveData
 import com.yosufzamil.courseregistration.database.CourseRegistrationDatabase
 import com.yosufzamil.courseregistration.database.entites.Course
+import com.yosufzamil.courseregistration.database.entites.EnrolledCourse
 import com.yosufzamil.courseregistration.database.entites.Student
 import com.yosufzamil.courseregistration.database.entites.StudentCourseCrossRef
 import com.yosufzamil.courseregistration.database.relation.StudentWithCourses
@@ -18,7 +19,7 @@ class LocalDBRepository {
 
         private  var courseRegistrationDatabase:CourseRegistrationDatabase?=null
 
-        fun initialDB(context: Context):CourseRegistrationDatabase?{
+        private fun initialDB(context: Context):CourseRegistrationDatabase?{
 
             return CourseRegistrationDatabase.getInstance(context)
         }
@@ -38,6 +39,13 @@ class LocalDBRepository {
                 courseRegistrationDatabase?.courseRegistrationDao()?.insertStudentAndCourse(crossRef)}
             }
 
+        fun enrolledCourse(context: Context,enrolledCourse: EnrolledCourse){
+            courseRegistrationDatabase= initialDB(context)
+
+            CoroutineScope(IO).launch {
+                courseRegistrationDatabase?.courseRegistrationDao()?.insertEnrolledCourse(enrolledCourse)}
+        }
+
         fun insertStudent(context: Context,student: Student){
            courseRegistrationDatabase= initialDB(context)
            CoroutineScope(IO).launch {
@@ -50,9 +58,14 @@ class LocalDBRepository {
             return courseRegistrationDatabase?.courseRegistrationDao()?.getAllCourse()
         }
 
-        fun getRegisterCourse(context: Context,studentId:String): LiveData<List<StudentWithCourses>>? {
+        fun getRegisterCourse(context: Context,studentId:String,term:Int): LiveData<List<StudentWithCourses>>? {
             courseRegistrationDatabase= initialDB(context)
             return courseRegistrationDatabase?.courseRegistrationDao()?.getSubjectOfStudent(studentId)
+        }
+
+        fun getEnrolledCourse(context: Context,studentId:String,term: Int): LiveData<List<EnrolledCourse>>? {
+            courseRegistrationDatabase= initialDB(context)
+            return courseRegistrationDatabase?.courseRegistrationDao()?.getEnrolledCourseOfStudent(studentId,term)
         }
 
         fun getStudentEmailORId(context: Context, email:String, id:String): LiveData<Student>? {

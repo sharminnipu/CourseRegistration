@@ -7,7 +7,7 @@
 
     <fragment
         android:id="@+id/nav_home"
-        android:name="com.yosufzamil.courseregistration.ui.home.HomeFragment"
+        android:name="com.yosufzamil.courseregistration.ui.home.avaiableCourse.AvailableFragment"
         android:label="@string/menu_home"
         tools:layout="@layout/fragment_home" >
         <action
@@ -16,23 +16,22 @@
     </fragment>
 
     <fragment
-        android:id="@+id/nav_gallery"
-        android:name="com.yosufzamil.courseregistration.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_gallery" />
-
-    <fragment
-        android:id="@+id/nav_slideshow"
-        android:name="com.yosufzamil.courseregistration.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_slideshow" />
-    <fragment
         android:id="@+id/courseDetailsFragment"
-        android:name="com.yosufzamil.courseregistration.ui.home.CourseDetailsFragment"
+        android:name="com.yosufzamil.courseregistration.ui.home.courseDetails.CourseDetailsFragment"
         android:label="course_details_fragment"
         tools:layout="@layout/course_details_fragment" >
         <action
             android:id="@+id/action_courseDetailsFragment_to_nav_home"
             app:destination="@id/nav_home" />
     </fragment>
+    <fragment
+        android:id="@+id/nav_term_one"
+        android:name="com.yosufzamil.courseregistration.ui.home.enrolledCourse.TermOneFragment"
+        android:label="@string/menu_term_1"
+        tools:layout="@layout/fragment_term_one" />
+    <fragment
+        android:id="@+id/nav_term_two"
+        android:name="com.yosufzamil.courseregistration.ui.home.enrolledCourse.TermTwoFragment"
+        android:label="@string/menu_term_2"
+        tools:layout="@layout/fragment_term_two" />
 </navigation>

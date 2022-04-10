@@ -40,15 +40,11 @@ class UserPreference(
             it.clear()
         }
     }
-    suspend fun saveAuthUserId(authId:String){
-        dataStore.edit {preferences ->
-            preferences[KEY_USER_ID]=authId
-        }
 
-    }
-    suspend fun saveAuthUserEmail(authEmail:String){
+    suspend fun saveAuthUser(authEmail:String,authId:String){
         dataStore.edit {preferences ->
             preferences[KEY_AUTH]=authEmail
+            preferences[KEY_USER_ID]=authId
         }
 
     }

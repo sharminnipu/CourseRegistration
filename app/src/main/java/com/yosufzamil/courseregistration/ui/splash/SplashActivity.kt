@@ -1,4 +1,4 @@
-package com.yosufzamil.courseregistration.ui
+package com.yosufzamil.courseregistration.ui.splash
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.util.Log
 import androidx.lifecycle.asLiveData
 import com.yosufzamil.courseregistration.databinding.ActivitySplashBinding
+import com.yosufzamil.courseregistration.ui.home.MainActivity
 import com.yosufzamil.courseregistration.ui.authentication.AuthenticationActivity
 import com.yosufzamil.courseregistration.utils.sessionManager.UserPreference
 
@@ -25,7 +26,7 @@ class SplashActivity : AppCompatActivity() {
                 Log.e("auth", it.toString())
                 if(it!=null){
                     finish()
-                    startActivity(Intent(this,MainActivity::class.java))
+                    startActivity(Intent(this, MainActivity::class.java))
                 }else{
                     finish()
                     startActivity(Intent(this,AuthenticationActivity::class.java))

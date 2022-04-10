@@ -3,7 +3,6 @@ package com.yosufzamil.courseregistration.ui.authentication
 import android.content.Intent
 import android.os.Bundle
 import android.text.TextUtils
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -14,7 +13,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.databinding.FragmentLoginBinding
-import com.yosufzamil.courseregistration.ui.MainActivity
+import com.yosufzamil.courseregistration.ui.home.MainActivity
 import com.yosufzamil.courseregistration.viewModel.AuthenticationViewModel
 
 class LoginFragment : Fragment() {
@@ -52,11 +51,9 @@ class LoginFragment : Fragment() {
             viewModel.getEmailAndPassword(requireContext(),getEmail,getPassword)?.observe(requireActivity(), Observer {
                 if(it!=null){
                     if(it.studentEmail==getEmail && it.studentPassword==getPassword){
-                        viewModel.saveAuthStudent(requireContext(),it.studentEmail)
-                       var result= viewModel.saveAuthStudentId(requireContext(),it.studentId)
-                        Log.e("result:", result.toString())
+                        viewModel.saveAuthStudent(requireContext(),it.studentEmail,it.studentId)
                         activity?.finish()
-                        startActivity(Intent(requireActivity(),MainActivity::class.java))
+                        startActivity(Intent(requireActivity(), MainActivity::class.java))
                     }else{
                         Toast.makeText(requireContext(),"The credential isn't matches!!",Toast.LENGTH_SHORT).show()
                     }

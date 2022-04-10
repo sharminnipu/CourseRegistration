@@ -5,13 +5,15 @@ import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import com.yosufzamil.courseregistration.database.entites.Course
+import com.yosufzamil.courseregistration.database.entites.EnrolledCourse
 import com.yosufzamil.courseregistration.database.entites.Student
 import com.yosufzamil.courseregistration.database.entites.StudentCourseCrossRef
 import com.yosufzamil.courseregistration.database.roomDAO.CourseRegistrationDao
 
 @Database(entities = [Student::class,
                      Course::class,
-                     StudentCourseCrossRef::class], version = 1)
+                     StudentCourseCrossRef::class,
+                     EnrolledCourse::class], version = 1)
 abstract class CourseRegistrationDatabase : RoomDatabase(){
     abstract fun courseRegistrationDao():CourseRegistrationDao
     companion object {

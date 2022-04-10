@@ -1,4 +1,4 @@
-package com.yosufzamil.courseregistration.ui
+package com.yosufzamil.courseregistration.ui.home
 
 import android.content.Intent
 import android.os.Bundle
@@ -6,8 +6,6 @@ import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
 import androidx.navigation.ui.AppBarConfiguration
@@ -45,19 +43,19 @@ class MainActivity : AppCompatActivity() {
 
 
     }
-    fun drawerNav(){
+    private fun drawerNav(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
         val navController = findNavController(R.id.nav_host_fragment)
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_home, R.id.nav_gallery, R.id.nav_slideshow
+            R.id.nav_home, R.id.nav_term_one, R.id.nav_term_two
         ), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
     }
-    fun  initalState(){
+    private fun  initalState(){
       viewModel= ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
     }
@@ -84,7 +82,7 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-    fun allCourseInsertedToDb(){
+    private fun allCourseInsertedToDb(){
         userPreference= UserPreference(this)
 
 
