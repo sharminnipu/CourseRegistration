@@ -5,6 +5,8 @@ import android.os.Bundle
 import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.ImageView
+import android.widget.TextView
 import android.widget.Toast
 import com.google.android.material.navigation.NavigationView
 import androidx.navigation.findNavController
@@ -22,6 +24,7 @@ import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.database.entites.Course
 import com.yosufzamil.courseregistration.repository.LocalDBRepository
 import com.yosufzamil.courseregistration.ui.authentication.AuthenticationActivity
+import com.yosufzamil.courseregistration.utils.AppConstant
 import com.yosufzamil.courseregistration.utils.sessionManager.UserPreference
 import com.yosufzamil.courseregistration.viewModel.AuthenticationViewModel
 import kotlinx.coroutines.launch
@@ -31,17 +34,26 @@ class MainActivity : AppCompatActivity() {
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var viewModel: AuthenticationViewModel
     private lateinit var userPreference: UserPreference
+    lateinit var tvName: TextView
+    lateinit var tvEmail: TextView
+
+    lateinit var ivPhoto: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+        userPreference= UserPreference(this)
         setSupportActionBar(toolbar)
-        initalState()
+        initialState()
         drawerNav()
         allCourseInsertedToDb()
 
 
+    }
+
+    private fun  initialState(){
+      viewModel= ViewModelProvider(this).get(AuthenticationViewModel::class.java)
     }
     private fun drawerNav(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
@@ -54,9 +66,20 @@ class MainActivity : AppCompatActivity() {
         ), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
+
+
+
+        //Todo get user profile attribute
+        val headerView = navView.getHeaderView(0)
+        // ivPhoto = headerView.findViewById(R.id.ivPhoto)
+
+        tvName = headerView.findViewById(R.id.tvStudentName)
+        tvEmail = headerView.findViewById(R.id.tvStudentEmail)
+        setUserGeneralProfile()
     }
-    private fun  initalState(){
-      viewModel= ViewModelProvider(this).get(AuthenticationViewModel::class.java)
+    private fun setUserGeneralProfile() {
+        tvName.text=AppConstant.authUserName
+        tvEmail.text=AppConstant.authUserEmail
 
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -81,10 +104,7 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-
     private fun allCourseInsertedToDb(){
-        userPreference= UserPreference(this)
-
 
         userPreference.courseInserted.asLiveData().observe(this, {
             Log.e("insertCourse: ",it.toString())

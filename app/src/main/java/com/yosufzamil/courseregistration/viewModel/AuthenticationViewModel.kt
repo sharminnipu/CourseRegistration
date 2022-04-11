@@ -13,11 +13,13 @@ class AuthenticationViewModel:ViewModel() {
 
     private lateinit var userPreference: UserPreference
 
-    fun saveAuthStudent(context:Context, authUserEmail:String,authUserId:String){
+    fun saveAuthStudent(context:Context, authUserEmail:String,authUserId:String,studentName:String):Boolean{
          userPreference= UserPreference(context)
          viewModelScope.launch {
-             userPreference.saveAuthUser(authUserEmail,authUserId)
+             userPreference.saveAuthUser(authUserEmail,authUserId,studentName)
          }
+
+        return true
 
      }
     fun deleteAuthEmail(context:Context){

@@ -30,6 +30,10 @@ class UserPreference(
         get() = dataStore.data.map {preferences ->
             preferences[KEY_AUTH]
         }
+    val authName: Flow<String?>
+        get() = dataStore.data.map {preferences ->
+            preferences[KEY_AUTH_NAME]
+        }
     val authId: Flow<String?>
         get() = dataStore.data.map {preferences ->
             preferences[KEY_USER_ID]
@@ -41,10 +45,13 @@ class UserPreference(
         }
     }
 
-    suspend fun saveAuthUser(authEmail:String,authId:String){
+    suspend fun saveAuthUser(authEmail:String,authId:String,studentName:String){
         dataStore.edit {preferences ->
             preferences[KEY_AUTH]=authEmail
             preferences[KEY_USER_ID]=authId
+            preferences[KEY_AUTH_NAME]=studentName
+
+
         }
 
     }
@@ -58,6 +65,7 @@ class UserPreference(
 
     companion object{
         private val KEY_AUTH= preferencesKey<String>("key_auth")
+        private val KEY_AUTH_NAME= preferencesKey<String>("key_auth_name")
         private val KEY_COURSE= preferencesKey<Boolean>("key_all_course")
         private val KEY_USER_ID= preferencesKey<String>("key_student_Id")
     }

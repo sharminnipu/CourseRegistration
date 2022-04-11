@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.adapter.AvailableCourseAdapter
 import com.yosufzamil.courseregistration.database.entites.Course
+import com.yosufzamil.courseregistration.databinding.AvailableCourseRecycleviewBinding
 import com.yosufzamil.courseregistration.viewModel.AvaiableViewModel
 import com.yosufzamil.courseregistration.utils.AppConstant.courseDetails
 import kotlinx.android.synthetic.main.fragment_home.*
