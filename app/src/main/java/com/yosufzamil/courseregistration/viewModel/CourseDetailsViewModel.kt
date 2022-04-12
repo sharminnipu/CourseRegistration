@@ -31,4 +31,10 @@ class CourseDetailsViewModel : ViewModel() {
         return  LocalDBRepository.getEnrolledCourse(context,studentId,term)
 
     }
+
+
+    fun getExistEnrolledCourse(context: Context,courseId:String):LiveData<EnrolledCourse>?{
+        return  LocalDBRepository.getExistEnrolledCourse(context,courseId)
+
+    }
 }

@@ -68,6 +68,11 @@ class LocalDBRepository {
             return courseRegistrationDatabase?.courseRegistrationDao()?.getEnrolledCourseOfStudent(studentId,term)
         }
 
+        fun getExistEnrolledCourse(context: Context,courseId:String): LiveData<EnrolledCourse>? {
+            courseRegistrationDatabase= initialDB(context)
+            return courseRegistrationDatabase?.courseRegistrationDao()?.getExistCourseInEnrolled(courseId)
+        }
+
         fun getStudentEmailORId(context: Context, email:String, id:String): LiveData<Student>? {
             courseRegistrationDatabase= initialDB(context)
              return courseRegistrationDatabase?.courseRegistrationDao()?.getExistEmailAndID(email,id)

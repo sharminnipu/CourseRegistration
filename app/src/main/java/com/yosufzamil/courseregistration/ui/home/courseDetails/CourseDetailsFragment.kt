@@ -14,18 +14,17 @@ import com.yosufzamil.courseregistration.database.entites.Course
 import com.yosufzamil.courseregistration.database.entites.EnrolledCourse
 import com.yosufzamil.courseregistration.database.entites.StudentCourseCrossRef
 import com.yosufzamil.courseregistration.databinding.CourseDetailsFragmentBinding
+import com.yosufzamil.courseregistration.utils.AppConstant
 import com.yosufzamil.courseregistration.utils.AppConstant.courseDetails
 import com.yosufzamil.courseregistration.utils.sessionManager.UserPreference
 import com.yosufzamil.courseregistration.viewModel.CourseDetailsViewModel
 
 class CourseDetailsFragment : Fragment() {
 
-private lateinit var binding: CourseDetailsFragmentBinding
-private lateinit var userPreference:UserPreference
+   private lateinit var binding: CourseDetailsFragmentBinding
+   private lateinit var userPreference:UserPreference
    private lateinit var course:Course
-   private lateinit var studentId:String
-   private lateinit var registerCourse:StudentCourseCrossRef
-    private lateinit var enrolledCourse:EnrolledCourse
+   private lateinit var enrolledCourse:EnrolledCourse
 
     private var courses:List<Course> = ArrayList<Course>()
     private lateinit var viewModel: CourseDetailsViewModel
@@ -49,13 +48,6 @@ private lateinit var userPreference:UserPreference
     private fun initState(){
         course=courseDetails!!
         userPreference= UserPreference(requireContext())
-
-        viewModel.getEnrolledCourse(requireContext(),"CSE-01",1)?.observe(requireActivity(), Observer { it ->
-            Log.e("enrolledCourse:",it.toString())
-
-        })
-
-
         binding.tvAvailableCourseName.text=course.courseName
         binding.tvAvailableCourseID.text="CourseId : "+course.courseId
         when (course.status) {
@@ -72,27 +64,56 @@ private lateinit var userPreference:UserPreference
                 binding.tvPrerequisite.text="CourseId : "+course.prerequisiteOne+" and "+course.prerequisiteTwo
             }
         }
-
         binding.tvTerm.text=course.term.toString()
         binding.tvCourseDescription.text=course.courseDescription
-
         binding.btnRegister.setOnClickListener {
-            // get authUserId from data store preference
-            userPreference.authId.asLiveData().observe(requireActivity(), {
-                Log.e("authId", it.toString())
-                if(it!=null){
-                    studentId=it
-                    enrolledCourse= EnrolledCourse(0,studentId,course)
+            if(course.year==1){
+                Toast.makeText(requireContext(),"You have already taken this last year course",Toast.LENGTH_LONG).show()
+            }else{
+                viewModel.getEnrolledCourse(requireContext(),AppConstant.authUserId.toString(),course.term)?.observe(requireActivity(), Observer {termCourses->
+                    if(termCourses.size==3){
+                        Toast.makeText(requireContext(),"Sorry you can't register.Already registered 3 courses",Toast.LENGTH_SHORT).show()
+                    }
+                    else{
+                        viewModel.getExistEnrolledCourse(requireContext(),course.courseId)?.observe(requireActivity(), Observer {existCourse->
+
+                            if(existCourse!=null){
+                                Toast.makeText(requireContext(),"You have already taken this course",Toast.LENGTH_LONG).show()
+                            }else{
+                                if(course.status==0){
+                                    enrolledCourse= EnrolledCourse(0,AppConstant.authUserId.toString(),course)
+                                    var result= viewModel.enrolledCourseToDb(requireContext(),enrolledCourse)
+                                    if(result){
+                                        Toast.makeText(requireContext()," Course Registration is successfully completed.",Toast.LENGTH_SHORT).show()
+                                    }
+                                    else{
+                                        Toast.makeText(requireContext(),"Your registration isn't completed!!",Toast.LENGTH_LONG).show()
+                                    }
+                                }else{
+
+                                   //if status not 0 this part have to done
+                                }
+
+                            }
+
+
+                        })
+
+                    }
+
+                })
+
+            }
+
+
+
+          /*  if(AppConstant.authUserId!=null){
+                    enrolledCourse= EnrolledCourse(0,AppConstant.authUserId.toString(),course)
                     var result= viewModel.enrolledCourseToDb(requireContext(),enrolledCourse)
                     if(result){
                         Toast.makeText(requireContext()," Course Registration is successfully completed.",Toast.LENGTH_SHORT).show()
                     }
-                }
-
-
-
-            })
-
+                }  */
 
         }
 

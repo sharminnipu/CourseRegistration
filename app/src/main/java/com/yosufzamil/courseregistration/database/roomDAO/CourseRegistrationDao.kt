@@ -38,6 +38,9 @@ interface CourseRegistrationDao {
     @Query("SELECT * FROM enrolledcourse WHERE enrolledStudentId= :enrolledStudentId AND term= :term")
     fun getEnrolledCourseOfStudent(enrolledStudentId:String,term:Int) :LiveData<List<EnrolledCourse>>
 
+    @Query("SELECT * FROM enrolledcourse WHERE courseId= :courseId")
+    fun getExistCourseInEnrolled(courseId:String) :LiveData<EnrolledCourse>
+
     @Transaction
    // @Query("SELECT * FROM student JOIN course ON student.studentId = Album.artistId")
     @Query("SELECT * FROM student WHERE studentId= :studentId")

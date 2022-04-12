@@ -22,6 +22,7 @@ import androidx.lifecycle.asLiveData
 import androidx.lifecycle.lifecycleScope
 import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.database.entites.Course
+import com.yosufzamil.courseregistration.database.entites.EnrolledCourse
 import com.yosufzamil.courseregistration.repository.LocalDBRepository
 import com.yosufzamil.courseregistration.ui.authentication.AuthenticationActivity
 import com.yosufzamil.courseregistration.utils.AppConstant
@@ -36,25 +37,19 @@ class MainActivity : AppCompatActivity() {
     private lateinit var userPreference: UserPreference
     lateinit var tvName: TextView
     lateinit var tvEmail: TextView
-
     lateinit var ivPhoto: ImageView
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         userPreference= UserPreference(this)
         setSupportActionBar(toolbar)
-        initialState()
         drawerNav()
         allCourseInsertedToDb()
-
-
+        completedCourseLastYear()
+        mandatoryCourseFor2ndYear()
     }
 
-    private fun  initialState(){
-      viewModel= ViewModelProvider(this).get(AuthenticationViewModel::class.java)
-    }
     private fun drawerNav(){
         val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
         val navView: NavigationView = findViewById(R.id.nav_view)
@@ -62,12 +57,11 @@ class MainActivity : AppCompatActivity() {
         // Passing each menu ID as a set of Ids because each
         // menu should be considered as top level destinations.
         appBarConfiguration = AppBarConfiguration(setOf(
-            R.id.nav_home, R.id.nav_term_one, R.id.nav_term_two
+                R.id.nav_home, R.id.nav_term_one, R.id.nav_term_two
         ), drawerLayout)
         setupActionBarWithNavController(navController, appBarConfiguration)
         navView.setupWithNavController(navController)
-
-
+        viewModel= ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
         //Todo get user profile attribute
         val headerView = navView.getHeaderView(0)
@@ -75,11 +69,51 @@ class MainActivity : AppCompatActivity() {
 
         tvName = headerView.findViewById(R.id.tvStudentName)
         tvEmail = headerView.findViewById(R.id.tvStudentEmail)
-        setUserGeneralProfile()
+        studentName()
+        studentEmail()
+        studentId()
+
     }
-    private fun setUserGeneralProfile() {
-        tvName.text=AppConstant.authUserName
-        tvEmail.text=AppConstant.authUserEmail
+    private  fun studentName(){
+        if(AppConstant.authUserName==null){
+            userPreference.authName.asLiveData().observe(this, {
+                Log.e("authName", it.toString())
+                if(it!=null){
+                    AppConstant.authUserName=it
+                    tvName.text=AppConstant.authUserName
+
+                }
+
+            })
+        }else{
+            tvName.text=AppConstant.authUserName
+        }
+
+    }
+    private fun  studentEmail(){
+        if(AppConstant.authUserEmail==null){
+            userPreference.authEmail.asLiveData().observe(this, {
+                Log.e("authEmail", it.toString())
+                if(it!=null){
+                    AppConstant.authUserEmail=it
+                    tvEmail.text=AppConstant.authUserEmail
+                }
+            })
+        }
+        else{
+            tvEmail.text=AppConstant.authUserEmail
+        }
+    }
+    private fun  studentId(){
+        if(AppConstant.authUserId==null){
+            userPreference.authId.asLiveData().observe(this, {
+                Log.e("authId", it.toString())
+                if(it!=null){
+                    AppConstant.authUserId=it
+                }
+            })
+        }
+
 
     }
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -104,8 +138,20 @@ class MainActivity : AppCompatActivity() {
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
 
-    private fun allCourseInsertedToDb(){
+    /*
+    There is insert all course data in the database.Data collected from assignment pdf file.I used status column for making condition course prerequisite.Where
 
+    status 0=no prerequisite,
+    status  1=single prerequisite,
+    status 2=or condition,
+    status 3=and condition
+AND
+
+    Mandatory column used for checking which course is mandatory course for per term.Where
+    mandatory 0=no,this course is not mandatory for the term.
+    mandatory 1=yes,this course is mandatory for the semester.So every student have to must take this course in the semester.
+    */
+    private fun allCourseInsertedToDb(){
         userPreference.courseInserted.asLiveData().observe(this, {
             Log.e("insertCourse: ",it.toString())
             if(it==null||it==false){
@@ -153,11 +199,66 @@ class MainActivity : AppCompatActivity() {
 
         })
 
+    }
+    private fun completedCourseLastYear(){
+      userPreference.courseCompletedInserted.asLiveData().observe(this, {
+          Log.e("insertCompletedCourse: ",it.toString())
+          if(it==null||it==false){
+              val courses = listOf(
+                      Course(
+                              "CS161", "Introduction to Programming", 1, "None", "None", 0, 1, 0,
+                              "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
+                      Course(
+                              "CS162", "Programming and Data Structure", 2, "CS161", "None", 1, 1, 0,
+                              "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something.")
 
+              )
+              var completedCourse= listOf(
+              EnrolledCourse(0,AppConstant.authUserId.toString(),courses[0]),
+              EnrolledCourse(1,AppConstant.authUserId.toString(),courses[1])
+              )
+              completedCourse.forEach {enrolledCompletedCourse->
+                  LocalDBRepository.enrolledCourse(this,enrolledCompletedCourse)
+              }
+              lifecycleScope.launch {
+                  userPreference.saveInsertCompletedCourse(true)
 
+              }
 
+          }
 
+      })
+
+  }
+
+    private fun mandatoryCourseFor2ndYear(){
+        userPreference.courseMandatoryInserted.asLiveData().observe(this, {
+            Log.e("insertMandatoryCourse: ",it.toString())
+            if(it==null||it==false){
+                val courses = listOf(
+                         Course(
+                        "CS255", "Advanced Data Structure", 1, "CS162", "None", 1, 2, 1,
+                "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
+                Course(
+                        "CS263", "Computer Architecture and Organization", 2, "CS255", "None", 1, 2, 1,
+                        "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."))
+                var mandatoryCourses= listOf(
+                        EnrolledCourse(2,AppConstant.authUserId.toString(),courses[0]),
+                        EnrolledCourse(3,AppConstant.authUserId.toString(),courses[1])
+                )
+                mandatoryCourses.forEach {enrolledMandatoryCourse->
+                    LocalDBRepository.enrolledCourse(this,enrolledMandatoryCourse)
+                }
+                lifecycleScope.launch {
+                    userPreference.saveInsertMandatoryCourse(true)
+
+                }
+
+            }
+
+        })
 
     }
+
 }
 

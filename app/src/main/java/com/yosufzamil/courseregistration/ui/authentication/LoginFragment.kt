@@ -19,6 +19,7 @@ import com.yosufzamil.courseregistration.ui.home.MainActivity
 import com.yosufzamil.courseregistration.utils.AppConstant
 import com.yosufzamil.courseregistration.utils.sessionManager.UserPreference
 import com.yosufzamil.courseregistration.viewModel.AuthenticationViewModel
+import kotlinx.coroutines.delay
 
 class LoginFragment : Fragment() {
 
@@ -57,11 +58,13 @@ class LoginFragment : Fragment() {
             viewModel.getEmailAndPassword(requireContext(),getEmail,getPassword)?.observe(requireActivity(), Observer {
                 if(it!=null){
                     if(it.studentEmail==getEmail && it.studentPassword==getPassword){
-                        var result=viewModel.saveAuthStudent(requireContext(),it.studentEmail,it.studentId,it.studentName)
+                      var result= viewModel.saveAuthStudent(requireContext(),it.studentEmail,it.studentId,it.studentName)
                         if(result){
-                            studentName()
-                            studentEmail()
-                            studentId()
+
+                         // print("result:$result")
+                            //studentName()
+                           // studentEmail()
+                            //studentId()
                             activity?.finish()
                             startActivity(Intent(requireActivity(), MainActivity::class.java))
                         }
@@ -80,45 +83,9 @@ class LoginFragment : Fragment() {
 
 
     }
-    private  fun studentName():Boolean{
-            userPreference.authName.asLiveData().observe(requireActivity(), {
-                Log.e("authName", it.toString())
-                if(it!=null){
-                    AppConstant.authUserName=it
 
-                }else{
-                    AppConstant.authUserName=null
-                }
 
-            })
-        return true
 
-    }
-    private fun studentEmail() :Boolean{
-
-            userPreference.authEmail.asLiveData().observe(requireActivity(), {
-                Log.e("authEmail", it.toString())
-                if(it!=null){
-                    AppConstant.authUserEmail=it
-                }else{
-                    AppConstant.authUserEmail=null
-                }
-
-            })
-        return true
-         }
-    private fun studentId():Boolean{
-            userPreference.authId.asLiveData().observe(requireActivity(), {
-                Log.e("authId", it.toString())
-                if(it!=null){
-                    AppConstant.authUserId=it
-                }else{
-                    AppConstant.authUserId=null
-                }
-
-            })
-        return true
-        }
 
 
 
