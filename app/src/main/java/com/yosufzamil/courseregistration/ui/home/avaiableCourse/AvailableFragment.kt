@@ -52,7 +52,7 @@ class AvailableFragment : Fragment() {
     private fun fetchData(courses:ArrayList<Course>){
 
         adapter = AvailableCourseAdapter(courses)
-        val llm = GridLayoutManager(requireContext(), 1)
+        val llm = GridLayoutManager(context, 1)
         llm.orientation = GridLayoutManager.VERTICAL
         rvAvailableCourse.layoutManager = llm
         rvAvailableCourse.adapter = adapter

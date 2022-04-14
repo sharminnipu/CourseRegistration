@@ -6,17 +6,16 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.asLiveData
 import androidx.recyclerview.widget.GridLayoutManager
-import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.adapter.TermAdapter
 import com.yosufzamil.courseregistration.database.entites.EnrolledCourse
-import com.yosufzamil.courseregistration.databinding.FragmentTermOneBinding
 import com.yosufzamil.courseregistration.databinding.FragmentTermTwoBinding
 import com.yosufzamil.courseregistration.utils.sessionManager.UserPreference
-import com.yosufzamil.courseregistration.viewModel.CourseDetailsViewModel
+import com.yosufzamil.courseregistration.viewModel.TermViewModel
 
 class TermTwoFragment : Fragment() {
     private lateinit var binding:FragmentTermTwoBinding
@@ -25,7 +24,7 @@ class TermTwoFragment : Fragment() {
     private lateinit var adapter: TermAdapter
     private lateinit var studentId:String
     private lateinit var courses:ArrayList<EnrolledCourse>
-    private lateinit var viewModel: CourseDetailsViewModel
+    private lateinit var viewModel: TermViewModel
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -47,12 +46,12 @@ class TermTwoFragment : Fragment() {
     private fun fetchData(){
         userPreference= UserPreference(requireContext())
         courses=ArrayList<EnrolledCourse>()
-        viewModel = ViewModelProvider(this).get(CourseDetailsViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(TermViewModel::class.java)
         userPreference.authId.asLiveData().observe(requireActivity(), {
             Log.e("authId", it.toString())
             if(it!=null){
                 studentId=it
-                viewModel.getEnrolledCourse(requireContext(),studentId,2)?.observe(requireActivity(), Observer { it ->
+                viewModel.getLiveDataEnrolledCourse(requireContext(),studentId,2)?.observe(viewLifecycleOwner, Observer { it ->
                     Log.e("enrolledCourse:",it.toString())
                     if(it.isEmpty()){
                         binding.emtyMsg2.visibility=View.VISIBLE
@@ -62,6 +61,9 @@ class TermTwoFragment : Fragment() {
                         Log.e("course size check",courses.size.toString())
                         loadAdapter(courses)
                     } }) } })
+
+
+
 
         /*   Log.e("course size check",courses.size.toString())
 
@@ -117,10 +119,20 @@ class TermTwoFragment : Fragment() {
     }
     private fun loadAdapter(courses:ArrayList<EnrolledCourse>){
         adapter = TermAdapter(courses)
-        val llm = GridLayoutManager(requireContext(), 1)
+        val llm = GridLayoutManager(context, 1)
         llm.orientation = GridLayoutManager.VERTICAL
         binding.rvEnrolledCourseTermTwo.layoutManager = llm
         binding.rvEnrolledCourseTermTwo.adapter = adapter
+
+        adapter.onDelete={modelList,position->
+            var result=viewModel.enrolledCourseDelete(requireContext(),modelList[position])
+            if(result){
+                modelList.removeAt(position)
+                adapter.notifyDataSetChanged()
+                Toast.makeText(requireActivity(),"Delete successfully!!", Toast.LENGTH_SHORT).show()
+            }
+
+        }
     }
 
 }

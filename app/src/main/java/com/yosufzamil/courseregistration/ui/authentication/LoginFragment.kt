@@ -54,17 +54,17 @@ class LoginFragment : Fragment() {
        var getEmail=binding.etEmail.text.toString().trim()
         var getPassword=binding.etPassword.text.toString().trim()
 
-        if(!TextUtils.isEmpty(getEmail) && !TextUtils.isEmpty(getPassword) ){
-            viewModel.getEmailAndPassword(requireContext(),getEmail,getPassword)?.observe(requireActivity(), Observer {
-                if(it!=null){
-                    if(it.studentEmail==getEmail && it.studentPassword==getPassword){
-                      var result= viewModel.saveAuthStudent(requireContext(),it.studentEmail,it.studentId,it.studentName)
-                        if(result){
+        Log.e("userEmail:",getEmail)
+        Log.e("userPass:",getPassword)
 
-                         // print("result:$result")
-                            //studentName()
-                           // studentEmail()
-                            //studentId()
+        if(!TextUtils.isEmpty(getEmail) && !TextUtils.isEmpty(getPassword) ){
+           var student= viewModel.getEmailAndPassword(requireContext(),getEmail,getPassword)
+
+            Log.e("studentREsult:",student.toString())
+                if(student!=null){
+                    if(student.studentEmail==getEmail && student.studentPassword==getPassword){
+                      var result= viewModel.saveAuthStudent(requireContext(),student.studentEmail,student.studentId,student.studentName)
+                        if(result){
                             activity?.finish()
                             startActivity(Intent(requireActivity(), MainActivity::class.java))
                         }
@@ -76,7 +76,7 @@ class LoginFragment : Fragment() {
                 }else{
                     Toast.makeText(requireContext(),"The credential isn't matches!!",Toast.LENGTH_SHORT).show()
                 }
-            })
+
         }else{
             Toast.makeText(requireContext(),"Please fill up the field.",Toast.LENGTH_SHORT).show()
         }

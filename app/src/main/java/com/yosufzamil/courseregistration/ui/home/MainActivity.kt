@@ -28,12 +28,14 @@ import com.yosufzamil.courseregistration.ui.authentication.AuthenticationActivit
 import com.yosufzamil.courseregistration.utils.AppConstant
 import com.yosufzamil.courseregistration.utils.sessionManager.UserPreference
 import com.yosufzamil.courseregistration.viewModel.AuthenticationViewModel
+import com.yosufzamil.courseregistration.viewModel.MainViewModel
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var appBarConfiguration: AppBarConfiguration
     private lateinit var viewModel: AuthenticationViewModel
+    private lateinit var viewMainModel:MainViewModel
     private lateinit var userPreference: UserPreference
     lateinit var tvName: TextView
     lateinit var tvEmail: TextView
@@ -42,12 +44,16 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         val toolbar: Toolbar = findViewById(R.id.toolbar)
+
+        viewMainModel= ViewModelProvider(this).get(MainViewModel::class.java)
+
         userPreference= UserPreference(this)
         setSupportActionBar(toolbar)
         drawerNav()
         allCourseInsertedToDb()
-        completedCourseLastYear()
-        mandatoryCourseFor2ndYear()
+        studentId()
+       // completedCourseLastYear("CSE-01")
+       // mandatoryCourseFor2ndYear("CSE-01")
     }
 
     private fun drawerNav(){
@@ -63,15 +69,11 @@ class MainActivity : AppCompatActivity() {
         navView.setupWithNavController(navController)
         viewModel= ViewModelProvider(this).get(AuthenticationViewModel::class.java)
 
-        //Todo get user profile attribute
         val headerView = navView.getHeaderView(0)
-        // ivPhoto = headerView.findViewById(R.id.ivPhoto)
-
         tvName = headerView.findViewById(R.id.tvStudentName)
         tvEmail = headerView.findViewById(R.id.tvStudentEmail)
         studentName()
         studentEmail()
-        studentId()
 
     }
     private  fun studentName(){
@@ -110,8 +112,12 @@ class MainActivity : AppCompatActivity() {
                 Log.e("authId", it.toString())
                 if(it!=null){
                     AppConstant.authUserId=it
+                    completedCourseLastYear(AppConstant.authUserId.toString())
+                    mandatoryCourseFor2ndYear(AppConstant.authUserId.toString())
                 }
             })
+
+
         }
 
 
@@ -125,6 +131,10 @@ class MainActivity : AppCompatActivity() {
         when(item.itemId){
             R.id.action_logout->{
                 viewModel.deleteAuthEmail(this)
+                AppConstant.authUserId=null
+                AppConstant.authUserName=null
+                AppConstant.authUserEmail=null
+
                 finish()
                 startActivity(Intent(this@MainActivity,AuthenticationActivity::class.java))
 
@@ -156,107 +166,118 @@ AND
             Log.e("insertCourse: ",it.toString())
             if(it==null||it==false){
                 val courses = listOf(
-                    Course("CS128","Introduction to Coding",2,"None","None",0,2,0,
+                    Course(1,"CS128","Introduction to Coding",2,"None","None",0,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS161","Introduction to Programming",1,"None","None",0,1,0,
+                    Course(2,"CS161","Introduction to Programming",1,"None","None",0,1,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS162","Programming and Data Structure",2,"CS161","None",1,1,0,
+                    Course(3,"CS162","Programming and Data Structure",2,"CS161","None",1,1,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS215","Social Issues",2,"None","None",0,2,0,
+                    Course(4,"CS215","Social Issues",2,"None","None",0,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS225","Health Analytic",1,"CS161","cs128",2,2,0,
+                    Course(5,"CS225","Health Analytic",1,"CS161","cs128",2,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS223","Data Science",1,"CS161","None",1,2,0,
+                    Course(6,"CS223","Data Science",1,"CS161","None",1,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS255","Advanced Data Structure",1,"CS162","None",1,2,1,
+                    Course(7,"CS255","Advanced Data Structure",1,"CS162","None",1,2,1,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS263","Computer Architecture and Organization",2,"CS255","None",1,2,1,
+                    Course(8,"CS263","Computer Architecture and Organization",2,"CS255","None",1,2,1,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS275","Database Management Systems",2,"CS162","None",1,2,0,
+                    Course(9,"CS275","Database Management Systems",2,"CS162","None",1,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS277","Discrete Structure",1,"Math101","CS162",2,2,0,
+                    Course(10,"CS277","Discrete Structure",1,"Math101","CS162",2,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS340","Evolutionary Computation",1,"None","None",0,2,0,
+                    Course(11,"CS340","Evolutionary Computation",1,"None","None",0,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS356","Theory of Computing",1,"CS255","CS277",3,2,0,
+                    Course(12,"CS356","Theory of Computing",1,"CS255","CS277",3,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS356","Theory of Computing",2,"CS255","CS277",3,2,0,
+                    Course(13,"CS356","Theory of Computing",2,"CS255","CS277",3,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS364","Mobile App Development",1,"CS162","None",1,2,0,
+                    Course(14,"CS364","Mobile App Development",1,"CS162","None",1,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS368","Data Communications and Networking",1,"CS255","None",1,2,0,
+                    Course(15,"CS368","Data Communications and Networking",1,"CS255","None",1,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                    Course("CS375","Operating Systems",1,"CS255","None",1,2,0,
+                    Course(16,"CS375","Operating Systems",1,"CS255","None",1,2,0,
                         "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something.")
 
                 )
-                LocalDBRepository.insertCourse(this,courses)
-                lifecycleScope.launch {
-                    userPreference.saveInsertCourse(true)
-                }
+                viewMainModel.insertCourseTODB(this,courses)
+                viewMainModel.saveInsertCourse(this,true)
 
             }
 
         })
 
     }
-    private fun completedCourseLastYear(){
-      userPreference.courseCompletedInserted.asLiveData().observe(this, {
-          Log.e("insertCompletedCourse: ",it.toString())
-          if(it==null||it==false){
-              val courses = listOf(
-                      Course(
-                              "CS161", "Introduction to Programming", 1, "None", "None", 0, 1, 0,
-                              "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                      Course(
-                              "CS162", "Programming and Data Structure", 2, "CS161", "None", 1, 1, 0,
-                              "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something.")
+    private fun completedCourseLastYear(studentId:String){
 
-              )
-              var completedCourse= listOf(
-              EnrolledCourse(0,AppConstant.authUserId.toString(),courses[0]),
-              EnrolledCourse(1,AppConstant.authUserId.toString(),courses[1])
-              )
-              completedCourse.forEach {enrolledCompletedCourse->
-                  LocalDBRepository.enrolledCourse(this,enrolledCompletedCourse)
-              }
-              lifecycleScope.launch {
-                  userPreference.saveInsertCompletedCourse(true)
+      var completedCourses=LocalDBRepository.getStudentCompletedCourse(this,"CS161","CS162",studentId)
+        if(completedCourses!!.size==0){
+            userPreference.courseCompletedInserted.asLiveData().observe(this, {
+                Log.e("insertCompletedCourse: ",it.toString())
+                if(it==null||it==false){
+                    val courses = listOf(
+                            Course(2,
+                                    "CS161", "Introduction to Programming", 1, "None", "None", 0, 1, 0,
+                                    "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
+                            Course(3,
+                                    "CS162", "Programming and Data Structure", 2, "CS161", "None", 1, 1, 0,
+                                    "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
+                    )
 
-              }
 
-          }
 
-      })
+                    var completedCourse= listOf(
+                            EnrolledCourse(5,studentId,courses[0]),
+                            EnrolledCourse(1,studentId,courses[1]),
+                    )
+
+                    viewMainModel.insertMandatoryCourse(this,completedCourse)
+                    viewMainModel.saveInsertCompletedCourse(this,true)
+
+                }
+
+            })
+            Log.e("print completed",completedCourses.toString())
+
+        }else{
+            Log.e("print completed",completedCourses.toString())
+        }
 
   }
 
-    private fun mandatoryCourseFor2ndYear(){
-        userPreference.courseMandatoryInserted.asLiveData().observe(this, {
-            Log.e("insertMandatoryCourse: ",it.toString())
-            if(it==null||it==false){
-                val courses = listOf(
-                         Course(
-                        "CS255", "Advanced Data Structure", 1, "CS162", "None", 1, 2, 1,
-                "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
-                Course(
-                        "CS263", "Computer Architecture and Organization", 2, "CS255", "None", 1, 2, 1,
-                        "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."))
-                var mandatoryCourses= listOf(
-                        EnrolledCourse(2,AppConstant.authUserId.toString(),courses[0]),
-                        EnrolledCourse(3,AppConstant.authUserId.toString(),courses[1])
-                )
-                mandatoryCourses.forEach {enrolledMandatoryCourse->
-                    LocalDBRepository.enrolledCourse(this,enrolledMandatoryCourse)
-                }
-                lifecycleScope.launch {
-                    userPreference.saveInsertMandatoryCourse(true)
+   private fun mandatoryCourseFor2ndYear(studentId: String){
 
-                }
+       var mandatoryCourses=LocalDBRepository.getStudentCompletedCourse(this,"CS255","CS263",studentId)
 
-            }
+       if(mandatoryCourses!!.size==0){
+           userPreference.courseMandatoryInserted.asLiveData().observe(this, {
+               Log.e("insertMandatoryCourse: ",it.toString())
+               if(it==null||it==false){
+                   val coursesMandatory = listOf(
+                           Course(7,
+                                   "CS255", "Advanced Data Structure", 1, "CS162", "None", 1, 2, 1,
+                                   "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."),
+                           Course(8,
+                                   "CS263", "Computer Architecture and Organization", 2, "CS255", "None", 1, 2, 1,
+                                   "Coding is telling a computer what to do, in a way that, with a bit of translation, it can understand. You give computers instructions in what is known as 'code', in a similar way to how you might have a recipe for how to cook something."))
+                   var mandatoryCourses= listOf(
+                           EnrolledCourse(2,studentId,coursesMandatory[0]),
+                           EnrolledCourse(3,studentId,coursesMandatory[1])
+                   )
 
-        })
+                   viewMainModel.insertMandatoryCourse(this,mandatoryCourses)
+                   viewMainModel.saveInsertMandatoryCourse(this,true)
+
+               }
+
+           })
+           Log.e("print completed",mandatoryCourses.toString())
+
+       }else{
+           Log.e("print completed",mandatoryCourses.toString())
+       }
+
+
 
     }
 

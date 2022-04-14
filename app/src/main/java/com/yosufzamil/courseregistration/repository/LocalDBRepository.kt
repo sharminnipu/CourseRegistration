@@ -1,14 +1,11 @@
 package com.yosufzamil.courseregistration.repository
 
 import android.content.Context
-import android.provider.ContactsContract
 import androidx.lifecycle.LiveData
 import com.yosufzamil.courseregistration.database.CourseRegistrationDatabase
 import com.yosufzamil.courseregistration.database.entites.Course
 import com.yosufzamil.courseregistration.database.entites.EnrolledCourse
 import com.yosufzamil.courseregistration.database.entites.Student
-import com.yosufzamil.courseregistration.database.entites.StudentCourseCrossRef
-import com.yosufzamil.courseregistration.database.relation.StudentWithCourses
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.launch
@@ -18,7 +15,6 @@ class LocalDBRepository {
     companion object{
 
         private  var courseRegistrationDatabase:CourseRegistrationDatabase?=null
-
         private fun initialDB(context: Context):CourseRegistrationDatabase?{
 
             return CourseRegistrationDatabase.getInstance(context)
@@ -31,13 +27,13 @@ class LocalDBRepository {
                 allCourse.forEach { courseRegistrationDatabase?.courseRegistrationDao()?.insertCourse(it)}
             }
         }
-
-        fun registerCourse(context: Context,crossRef: StudentCourseCrossRef){
+        fun insertMandatoryCourse(context: Context, allCourse:List<EnrolledCourse>){
             courseRegistrationDatabase= initialDB(context)
 
             CoroutineScope(IO).launch {
-                courseRegistrationDatabase?.courseRegistrationDao()?.insertStudentAndCourse(crossRef)}
+                allCourse.forEach { courseRegistrationDatabase?.courseRegistrationDao()?.insertEnrolledCourse(it)}
             }
+        }
 
         fun enrolledCourse(context: Context,enrolledCourse: EnrolledCourse){
             courseRegistrationDatabase= initialDB(context)
@@ -58,30 +54,83 @@ class LocalDBRepository {
             return courseRegistrationDatabase?.courseRegistrationDao()?.getAllCourse()
         }
 
-        fun getRegisterCourse(context: Context,studentId:String,term:Int): LiveData<List<StudentWithCourses>>? {
+
+
+        fun getEnrolledCourse(context: Context,studentId:String,term: Int): List<EnrolledCourse>? {
             courseRegistrationDatabase= initialDB(context)
-            return courseRegistrationDatabase?.courseRegistrationDao()?.getSubjectOfStudent(studentId)
+
+            return courseRegistrationDatabase?.courseRegistrationDao()?.getEnrolledCourseOfStudent(studentId,term,2)
+
         }
 
-        fun getEnrolledCourse(context: Context,studentId:String,term: Int): LiveData<List<EnrolledCourse>>? {
+        fun getLiveDataEnrolledCourse(context: Context,studentId:String,term: Int): LiveData<List<EnrolledCourse>>? {
             courseRegistrationDatabase= initialDB(context)
-            return courseRegistrationDatabase?.courseRegistrationDao()?.getEnrolledCourseOfStudent(studentId,term)
+            return   courseRegistrationDatabase?.courseRegistrationDao()?.getLiveDataEnrolledCourseOfStudent(studentId,term,2)
         }
 
-        fun getExistEnrolledCourse(context: Context,courseId:String): LiveData<EnrolledCourse>? {
+        fun getExistEnrolledCourse(context: Context,courseId:String,studentId: String): EnrolledCourse? {
             courseRegistrationDatabase= initialDB(context)
-            return courseRegistrationDatabase?.courseRegistrationDao()?.getExistCourseInEnrolled(courseId)
+
+            return  courseRegistrationDatabase?.courseRegistrationDao()?.getExistCourseInEnrolled(courseId,studentId)
+
+
         }
 
-        fun getStudentEmailORId(context: Context, email:String, id:String): LiveData<Student>? {
+        fun getExistPrerequisiteCourse(context: Context,courseId:String,studentId: String): EnrolledCourse? {
             courseRegistrationDatabase= initialDB(context)
-             return courseRegistrationDatabase?.courseRegistrationDao()?.getExistEmailAndID(email,id)
+            return   courseRegistrationDatabase?.courseRegistrationDao()?.getPrerequisiteCompletedCourseBeforeTakenTheCourse(courseId,studentId)
+        }
+
+        fun getExistPrerequisiteCourseOR(context: Context,prerequisiteOne:String,prerequisiteTwo:String,studentId: String): EnrolledCourse? {
+            courseRegistrationDatabase= initialDB(context)
+            return   courseRegistrationDatabase?.courseRegistrationDao()?.getPrerequisiteCompletedCourseBeforeTakenTheCourseOROption(prerequisiteOne,prerequisiteTwo,studentId)
+
+
+        }
+
+        fun getExistPrerequisiteCourseAND(context: Context,prerequisiteOne:String,prerequisiteTwo:String,studentId: String): List<EnrolledCourse>? {
+            courseRegistrationDatabase= initialDB(context)
+            return  courseRegistrationDatabase?.courseRegistrationDao()?.getPrerequisiteCompletedCourseBeforeTakenTheCourseANDOption(prerequisiteOne,prerequisiteTwo,studentId)
+        }
+
+        fun getStudentCompletedCourse(context: Context,courseIdOne:String,courseIdTwo:String,studentId: String): List<EnrolledCourse>? {
+            courseRegistrationDatabase= initialDB(context)
+            return  courseRegistrationDatabase?.courseRegistrationDao()?.getStudentCompletedCourse(courseIdOne,courseIdTwo,studentId)
+        }
+
+        fun getStudentMandatoryCourse(context: Context,courseIdOne:String,courseIdTwo:String,studentId: String): List<EnrolledCourse>? {
+            courseRegistrationDatabase= initialDB(context)
+            return  courseRegistrationDatabase?.courseRegistrationDao()?.getStudentMandatoryCourse(courseIdOne,courseIdTwo,studentId)
+        }
+
+        fun getExitedInPrerequisiteColumn(context: Context,courseId: String,studentId: String): EnrolledCourse? {
+            courseRegistrationDatabase= initialDB(context)
+
+            return  courseRegistrationDatabase?.courseRegistrationDao()?.getExitedInPrerequisiteColumn(courseId,studentId)
+
+
+        }
+
+      fun getStudentEmailORId(context: Context, email:String, id:String): Student? {
+            courseRegistrationDatabase= initialDB(context)
+
+          return courseRegistrationDatabase?.courseRegistrationDao()?.getExistEmailAndID(email,id)
+
         }
 
 
-        fun getEmailAndPassword(context: Context, email:String, password:String): LiveData<Student>? {
+        fun getEmailAndPassword(context: Context, email:String, password:String): Student? {
             courseRegistrationDatabase= initialDB(context)
             return courseRegistrationDatabase?.courseRegistrationDao()?.getEmailAndPassword(email,password)
+        }
+
+
+        fun deleteEnrolledCourse(context: Context,enrolledCourse:EnrolledCourse){
+            courseRegistrationDatabase= initialDB(context)
+            CoroutineScope(IO).launch {
+                courseRegistrationDatabase?.courseRegistrationDao()?.delete(enrolledCourse)
+            }
+
         }
 
     }

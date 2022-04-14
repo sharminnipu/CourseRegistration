@@ -2,17 +2,13 @@ package com.yosufzamil.courseregistration.ui.home.courseDetails
 
 import androidx.lifecycle.ViewModelProvider
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.lifecycle.Observer
-import androidx.lifecycle.asLiveData
 import com.yosufzamil.courseregistration.database.entites.Course
 import com.yosufzamil.courseregistration.database.entites.EnrolledCourse
-import com.yosufzamil.courseregistration.database.entites.StudentCourseCrossRef
 import com.yosufzamil.courseregistration.databinding.CourseDetailsFragmentBinding
 import com.yosufzamil.courseregistration.utils.AppConstant
 import com.yosufzamil.courseregistration.utils.AppConstant.courseDetails
@@ -68,52 +64,82 @@ class CourseDetailsFragment : Fragment() {
         binding.tvCourseDescription.text=course.courseDescription
         binding.btnRegister.setOnClickListener {
             if(course.year==1){
-                Toast.makeText(requireContext(),"You have already taken this last year course",Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity(),"You have already taken this last year course",Toast.LENGTH_LONG).show()
             }else{
-                viewModel.getEnrolledCourse(requireContext(),AppConstant.authUserId.toString(),course.term)?.observe(requireActivity(), Observer {termCourses->
-                    if(termCourses.size==3){
-                        Toast.makeText(requireContext(),"Sorry you can't register.Already registered 3 courses",Toast.LENGTH_SHORT).show()
+               var result= viewModel.getEnrolledCourse(requireContext(),AppConstant.authUserId.toString(),course.term)
+                    if(result?.size==3){
+                        Toast.makeText(requireActivity(),"Sorry you can't register.Already registered 3 courses",Toast.LENGTH_SHORT).show()
                     }
-                    else{
-                        viewModel.getExistEnrolledCourse(requireContext(),course.courseId)?.observe(requireActivity(), Observer {existCourse->
+                    else {
+                        var existEnrolledCourse = viewModel.getExistEnrolledCourse(requireContext(), course.courseId,AppConstant.authUserId.toString())
 
-                            if(existCourse!=null){
-                                Toast.makeText(requireContext(),"You have already taken this course",Toast.LENGTH_LONG).show()
-                            }else{
-                                if(course.status==0){
-                                    enrolledCourse= EnrolledCourse(0,AppConstant.authUserId.toString(),course)
-                                    var result= viewModel.enrolledCourseToDb(requireContext(),enrolledCourse)
-                                    if(result){
-                                        Toast.makeText(requireContext()," Course Registration is successfully completed.",Toast.LENGTH_SHORT).show()
-                                    }
-                                    else{
-                                        Toast.makeText(requireContext(),"Your registration isn't completed!!",Toast.LENGTH_LONG).show()
-                                    }
-                                }else{
-
-                                   //if status not 0 this part have to done
+                        if (existEnrolledCourse != null) {
+                            Toast.makeText(requireActivity(), "You have already taken this course", Toast.LENGTH_LONG).show()
+                        } else {
+                            if (course.status == 0) {
+                                enrolledCourse = EnrolledCourse(0, AppConstant.authUserId.toString(), course)
+                                var result = viewModel.enrolledCourseToDb(requireContext(), enrolledCourse)
+                                if (result) {
+                                    Toast.makeText(requireActivity(), " Course Registration is successfully completed.", Toast.LENGTH_SHORT).show()
+                                } else {
+                                    Toast.makeText(requireActivity(), "Your registration isn't completed!!", Toast.LENGTH_LONG).show()
                                 }
+                            } else {
 
+                                when (course.status) {
+                                    1 -> {
+                                        var existPrerequisiteCourse = viewModel.getExitPrerequisiteCourse(requireContext(), course.prerequisiteOne,AppConstant.authUserId.toString())
+                                        if (existPrerequisiteCourse != null) {
+                                            enrolledCourse = EnrolledCourse(0, AppConstant.authUserId.toString(), course)
+                                            var result = viewModel.enrolledCourseToDb(requireContext(), enrolledCourse)
+                                            if (result) {
+                                                Toast.makeText(requireActivity(), " Course Registration is successfully completed.", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(requireActivity(), "Your registration isn't completed!!", Toast.LENGTH_LONG).show()
+                                            }
+                                        } else {
+                                            Toast.makeText(requireActivity(), "You have to completed prerequisite ${course.prerequisiteOne} course before taken this course", Toast.LENGTH_LONG).show()
+                                        }
+
+                                    }
+                                    2 -> {
+                                        var existPrerequisiteCourse = viewModel.getExitPrerequisiteCourseOR(requireContext(), course.prerequisiteOne, course.prerequisiteTwo,AppConstant.authUserId.toString())
+                                        if (existPrerequisiteCourse != null) {
+                                            enrolledCourse = EnrolledCourse(0, AppConstant.authUserId.toString(), course)
+                                            var result = viewModel.enrolledCourseToDb(requireContext(), enrolledCourse)
+                                            if (result) {
+                                                Toast.makeText(requireActivity(), " Course Registration is successfully completed.", Toast.LENGTH_SHORT).show()
+                                            } else {
+                                                Toast.makeText(requireActivity(), "Your registration isn't completed!!", Toast.LENGTH_LONG).show()
+                                            }
+                                        } else {
+                                            Toast.makeText(requireActivity(), "You have to completed prerequisite ${course.prerequisiteOne} OR ${course.prerequisiteTwo} course before taken this course", Toast.LENGTH_LONG).show()
+                                        }
+
+
+                                    }
+                                    3 -> {
+                                        var existPrerequisiteCourses = viewModel.getExitPrerequisiteCourseAND(requireContext(), course.prerequisiteOne, course.prerequisiteTwo,AppConstant.authUserId.toString())
+                                        if (existPrerequisiteCourses != null) {
+                                            if (existPrerequisiteCourses.size == 2) {
+                                                enrolledCourse = EnrolledCourse(0, AppConstant.authUserId.toString(), course)
+                                                var result = viewModel.enrolledCourseToDb(requireContext(), enrolledCourse)
+                                                if (result) {
+                                                    Toast.makeText(requireActivity(), " Course Registration is successfully completed.", Toast.LENGTH_SHORT).show()
+                                                } else {
+                                                    Toast.makeText(requireActivity(), "Your registration isn't completed!!", Toast.LENGTH_LONG).show()
+                                                }
+                                            }
+
+                                        } else {
+                                            Toast.makeText(requireActivity(), "You have to completed prerequisite ${course.prerequisiteOne} AND ${course.prerequisiteTwo}  both courses before taken this course", Toast.LENGTH_LONG).show()
+                                        }
+                                    }
+                                }
                             }
-
-
-                        })
-
+                        }
                     }
-
-                })
-
             }
-
-
-
-          /*  if(AppConstant.authUserId!=null){
-                    enrolledCourse= EnrolledCourse(0,AppConstant.authUserId.toString(),course)
-                    var result= viewModel.enrolledCourseToDb(requireContext(),enrolledCourse)
-                    if(result){
-                        Toast.makeText(requireContext()," Course Registration is successfully completed.",Toast.LENGTH_SHORT).show()
-                    }
-                }  */
 
         }
 

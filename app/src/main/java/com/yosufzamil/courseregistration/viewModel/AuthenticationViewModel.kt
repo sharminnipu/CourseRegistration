@@ -33,10 +33,10 @@ class AuthenticationViewModel:ViewModel() {
         LocalDBRepository.insertStudent(context,student)
         return true
     }
-    fun getExistEmailORId(context: Context, studentEmail:String,studentId:String):LiveData<Student>? {
+   fun getExistEmailORId(context: Context, studentEmail:String,studentId:String) :Student?{
         return LocalDBRepository.getStudentEmailORId(context,studentEmail,studentId)
     }
-    fun getEmailAndPassword(context: Context, studentEmail:String,studentPassword:String):LiveData<Student>? {
+    fun getEmailAndPassword(context: Context, studentEmail:String,studentPassword:String): Student? {
         return LocalDBRepository.getEmailAndPassword(context,studentEmail,studentPassword)
     }
 

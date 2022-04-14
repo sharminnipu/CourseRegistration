@@ -1,5 +1,6 @@
 package com.yosufzamil.courseregistration.ui.authentication
 
+import android.content.Intent
 import android.os.Binder
 import android.os.Bundle
 import android.text.TextUtils
@@ -11,10 +12,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.yosufzamil.courseregistration.R
 import com.yosufzamil.courseregistration.database.entites.Student
 import com.yosufzamil.courseregistration.databinding.FragmentRegistrationBinding
 import com.yosufzamil.courseregistration.viewModel.AuthenticationViewModel
+import kotlinx.coroutines.launch
 
 
 class RegistrationFragment : Fragment() {
@@ -33,6 +37,10 @@ class RegistrationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         signUpButtonPress()
+        binding.tvLogin.setOnClickListener {
+            activity?.finish()
+            startActivity(Intent(requireActivity(),AuthenticationActivity::class.java))
+        }
     }
     private fun signUpButtonPress(){
         binding.signUpBtn.setOnClickListener {
@@ -50,19 +58,17 @@ class RegistrationFragment : Fragment() {
         if(!TextUtils.isEmpty(studentName) && !TextUtils.isEmpty(studentEmail) && !TextUtils.isEmpty(studentId) && !TextUtils.isEmpty(newPassword) && !TextUtils.isEmpty(confirmPassword)) {
 
             if (newPassword == confirmPassword) {
+                var result=viewModel.getExistEmailORId(requireContext(),studentEmail,studentId)
+                Log.e("result", result.toString() )
 
-                viewModel.getExistEmailORId(requireContext(),studentEmail,studentId)?.observe(requireActivity(), Observer {
-
-                    if (it!=null) {
-                        Log.e("student data:",  it.toString())
-
-                        if( it.studentEmail == studentEmail){
+                if (result!=null) {
+                        if( result.studentEmail == studentEmail){
                             Toast.makeText(
                                     requireContext(),
                                     "This email address already exist",
                                     Toast.LENGTH_SHORT
                             ).show()
-                        }else if(it.studentId==studentId){
+                        }else if(result.studentId==studentId){
                             Toast.makeText(
                                     requireContext(),
                                     "Student ID already exist",
@@ -78,6 +84,12 @@ class RegistrationFragment : Fragment() {
                                 Student(studentId, studentName, studentEmail, studentPhone, confirmPassword)
                         )
                         if (result) {
+                            binding.etStudentName.text.clear()
+                            binding.etStudentEmail.text.clear()
+                            binding.etStudentPhone.text.clear()
+                            binding.etStudentId.text.clear()
+                            binding.etNewPassword.text.clear()
+                            binding.etConfirmNo.text.clear()
                             Toast.makeText(
                                     requireContext(),
                                     "Registration is successfully completed!!",
@@ -93,49 +105,6 @@ class RegistrationFragment : Fragment() {
 
                     }
 
-
-                })
-
-               /*   var student:Student?= viewModel.getExistEmailORId(requireContext(), studentEmail, studentId)
-                if ( student!=null) {
-                         Log.e("student data:",  student.toString())
-
-                        if( student.studentEmail == studentEmail){
-                            Toast.makeText(
-                                    requireContext(),
-                                    "This email address already exist",
-                                    Toast.LENGTH_SHORT
-                            ).show()
-                        }else if( student.studentId==studentId){
-                            Toast.makeText(
-                                    requireContext(),
-                                    "Student ID already exist",
-                                    Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-
-                    } else {
-
-                    val result = viewModel.insertStudentToDb(
-                            requireContext(),
-                            Student(studentId, studentName, studentEmail, studentPhone, confirmPassword)
-                    )
-                    if (result) {
-                        Toast.makeText(
-                                requireContext(),
-                                "Registration is successfully completed!!",
-                                Toast.LENGTH_SHORT
-                        ).show()
-                    } else {
-                        Toast.makeText(
-                                requireContext(),
-                                "Sorry, Registration isn't successfully completed!!",
-                                Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                }    */
             }
 
         }else{
